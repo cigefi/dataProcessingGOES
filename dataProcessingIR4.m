@@ -212,6 +212,9 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                     end
                     %GOES = cat(3,GOES,prodata);
                 end
+                fid = fopen(strcat(char(logPath),'log.txt'), 'at+');
+                fprintf(fid, '[SAVED][%s] %s\n\n',char(datetime('now')),char(fileT));
+                fclose(fid);
                 disp(char(strcat({'Data saved: '},char(fileT))));
                 delete(char(fileT));
 
