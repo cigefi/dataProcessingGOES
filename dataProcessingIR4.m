@@ -108,6 +108,8 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                             newTimeStamp{5} = lenZ;
 %                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
                             tlWV = cat(1,tlWV,newTimeStamp);
+                        otherwise
+                            continue;
                     end
                     
                     % Auxiliary (AUX) block
