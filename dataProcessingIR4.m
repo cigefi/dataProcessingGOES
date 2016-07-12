@@ -13,7 +13,6 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
             tlIR4 = [];
             tlVIS = [];
             tlWV = [];
-            %timeline = [];
     end
     if nargin < 1
         error('dataProcessingIR4: dirName is a required input')
@@ -27,18 +26,18 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
         path = path.concat('/');
     end
     if(length(dirName)>1)
-        save_path = java.lang.String(dirName(2));
+        savePath = java.lang.String(dirName(2));
         if(length(dirName)>2)
             logPath = java.lang.String(dirName(3));
         else
             logPath = java.lang.String(dirName(2));
         end
 	else
-		save_path = java.lang.String(dirName(1));
+		savePath = java.lang.String(dirName(1));
 		logPath = java.lang.String(dirName(1));
     end
-    if(save_path.charAt(save_path.length-1) ~= '/')
-        save_path = save_path.concat('/');
+    if(savePath.charAt(savePath.length-1) ~= '/')
+        savePath = savePath.concat('/');
     end
     if(logPath.charAt(logPath.length-1) ~= '/')
         logPath = logPath.concat('/');
@@ -92,9 +91,8 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                             end
                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
                             tlWV = cat(1,tlWV,newTimeStamp);
-                    end 
-                    %newTimeStamp = strcat({'Start date: '},num2str(area.W4),{' - Start time: '},num2str(area.W5),{' - Area number: '},num2str(area.W33),{' - Position(Z): '},num2str(posZ),{' - Length(Z): '},num2str(lenZ));
-                    %timeline = cat(1,timeline,newTimeStamp);
+                    end
+                    
                     % Auxiliary (AUX) block
                     if (area.W61 - area.W60) > 0
                         fid2 = fopen('aux.goes','wb');
@@ -111,7 +109,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                         fid2 = fopen('nav.goes','wb');
                         fwrite(fid2,data(area.W35+1:lpos));
                         fclose(fid2);
-                        nav = getNAV('nav.goes');
+                        %nav = getNAV('nav.goes');
                     end
                     % Calibration (CAL) block
                     if area.W63 > 0
@@ -120,7 +118,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                         fclose(fid2);
                     end
                     % Digital data (DATA) block
-                    %% Configuration params
+                    % Configuration params
                     if area.W36 > 0
                         valcode = 4; % Validity code length
                     else
@@ -193,8 +191,12 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                     end
 %                     plotMap(prodata);
                     %plotMap(permute(prodata,[2 1]));
-%                     prodata = double(area.W7) + (prodata*double(area.W13));
-%                     prodata = double(area.W6) + (prodata*double(area.W12));
+%                     a = filtrateData(prodata,100);
+%                     if sum(a~=0) > 0
+%                         disp('FOUND');
+%                     end
+                    %prodata1 = double(area.W7) + (prodata*double(area.W13));
+                    %prodata2 = double(area.W6) + (prodata*double(area.W12));
                     %plotMap(prodata);
 %                     figure;
 %                     contourf(prodata);
@@ -202,6 +204,9 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
 %                     contourf(permute(prodata,[2 1]));
                 end
                 if ~isempty(prodata)
+                    if ~exist(char(savePath),'dir')
+                        mkdir(char(savePath));
+                    end
                     switch (var2Read)
                         case 'IR4'
                             IR4 = cat(3,IR4,prodata);
@@ -210,37 +215,58 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                         case 'WV3'
                             WV = cat(3,WV,prodata);
                     end
+                    if ~mod(f,100)
+                        disp(char(strcat('Processed files ',{' '},num2str(f),{' of '},num2str(length(dirData)-3))));
+                        if ~isempty(IR4)
+                            save(char(savePath.concat('IR4.mat')),'IR4');
+                        end
+                        if ~isempty(tlIR4)
+                            save(char(savePath.concat('IR4-timeline.mat')),'tlIR4');
+                        end
+                        if ~isempty(VIS)
+                            save(char(savePath.concat('VIS.mat')),'VIS');
+                        end
+                        if ~isempty(tlVIS)
+                            save(char(savePath.concat('VIS-timeline.mat')),'tlVIS');
+                        end
+                        if ~isempty(WV)
+                            save(char(savePath.concat('WV.mat')),'WV');
+                        end
+                        if ~isempty(tlWV)
+                            save(char(savePath.concat('WV-timeline.mat')),'tlWV');
+                        end
+                    end
                     %GOES = cat(3,GOES,prodata);
                 end
                 fid = fopen(strcat(char(logPath),'log.txt'), 'at+');
                 fprintf(fid, '[SAVED][%s] %s\n\n',char(datetime('now')),char(fileT));
                 fclose(fid);
-                disp(char(strcat({'Data saved: '},char(fileT))));
+%                 disp(char(strcat({'Data saved: '},char(fileT))));
                 delete(char(fileT));
 
             catch exception
                 if(exist(char(logPath),'dir'))
-                    fid = fopen(strcat(char(logPath),'log.txt'), 'at+');
-                    fprintf(fid, '[ERROR][%s] %s\n %s\n\n',char(datetime('now')),char(fileT),char(exception.message));
-                    fclose(fid);
+                    try
+                        fid = fopen(strcat(char(logPath),'log.txt'), 'at+');
+                        fprintf(fid, '[ERROR][%s] %s\n %s\n\n',char(datetime('now')),char(fileT),char(exception.message));
+                        fclose(fid);
+                    catch
+                    end
                 end
+                disp(exception.message);
                 continue;
             end
         else
             if isequal(dirData(f).isdir,1)
                 newPath = char(path.concat(dirData(f).name));
-                [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4({newPath,char(save_path.concat(dirData(f).name)),char(logPath)},IR4,VIS,WV,tlIR4,tlVIS,tlWV);
+                [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4({newPath,char(savePath.concat(dirData(f).name)),char(logPath)},IR4,VIS,WV,tlIR4,tlVIS,tlWV);
             end
         end
     end
-%     if ~isempty(GOES)
-%         dlmwrite(strcat(char(save_path),'GOES.dat'),GOES);
-%     end
 end
 
 function [areaDir,err] = getAreaDirectory(fileName)
     err = NaN;
-    % Temp file
     try
         fid = fopen(fileName,'rb');
         data = fread(fid,256);
@@ -257,26 +283,6 @@ function [areaDir,err] = getAreaDirectory(fileName)
         char(exception.message);
     end
 end
-
-% function [aux,err] = getAUX(fileName)
-%     err = NaN;
-%     % Temp file
-%     try
-%         fid = fopen(fileName,'rb');
-%         data = fread(fid,256);
-%         fclose(fid);
-%         fid = fopen('temp.goes','wb');
-%         fwrite(fid,data);
-%         fclose(fid);
-%         map = memmapfile('temp.goes','Format',{'uint32',1,'W1';'uint32',1,'W2';'uint32',1,'W3';'uint32',1,'W4';'uint32',1,'W5';'uint32',1,'W6';'uint32',1,'W7';'uint32',1,'W8';'uint32',1,'W9';'uint32',1,'W10';'uint32',1,'W11';'uint32',1,'W12';'uint32',1,'W13';'uint32',1,'W14';'uint32',1,'W15';'uint32',1,'W16';'uint32',1,'W17';'uint32',1,'W18';'uint32',1,'W19';'uint32',1,'W20';'uint32',1,'W21';'uint32',1,'W22';'uint32',1,'W23';'uint32',1,'W24';'uint32',1,'W25';'uint32',1,'W26';'uint32',1,'W27';'uint32',1,'W28';'uint32',1,'W29';'uint32',1,'W30';'uint32',1,'W31';'uint32',1,'W32';'uint32',1,'W33';'uint32',1,'W34';'uint32',1,'W35';'uint32',1,'W36';'uint32',1,'W37';'uint32',1,'W38';'uint32',1,'W39';'uint32',1,'W40';'uint32',1,'W41';'uint32',1,'W42';'uint32',1,'W43';'uint32',1,'W44';'uint32',1,'W45';'uint32',1,'W46';'uint32',1,'W47';'uint32',1,'W48';'uint32',1,'W49';'uint32',1,'W50';'uint32',1,'W51';'uint32',1,'W52';'uint32',1,'W53';'uint32',1,'W54';'uint32',1,'W55';'uint32',1,'W56';'uint32',1,'W57';'uint32',1,'W58';'uint32',1,'W59';'uint32',1,'W60';'uint32',1,'W61';'uint32',1,'W62';'uint32',1,'W63';'uint32',1,'W64'});
-%         aux = map.Data;
-%         clear map;
-%         delete('temp.goes');
-%     catch exception
-%         aux = NaN;
-%         char(exception.message);
-%     end
-% end
 
 function [nav,err] = getNAV(fileName)
     err = NaN;
@@ -340,43 +346,20 @@ function [] = plotMap(data2D)
     %savefig('PeaksFile.fig')
     %close(f);
 end
-% 
-% function [cal,err] = getCAL(fileName)
-%     err = NaN;
-%     % Temp file
-%     try
-%         fid = fopen(fileName,'rb');
-%         data = fread(fid,256);
-%         fclose(fid);
-%         fid = fopen('temp.goes','wb');
-%         fwrite(fid,data);
-%         fclose(fid);
-%         map = memmapfile('temp.goes','Format',{'uint32',1,'W1';'uint32',1,'W2';'uint32',1,'W3';'uint32',1,'W4';'uint32',1,'W5';'uint32',1,'W6';'uint32',1,'W7';'uint32',1,'W8';'uint32',1,'W9';'uint32',1,'W10';'uint32',1,'W11';'uint32',1,'W12';'uint32',1,'W13';'uint32',1,'W14';'uint32',1,'W15';'uint32',1,'W16';'uint32',1,'W17';'uint32',1,'W18';'uint32',1,'W19';'uint32',1,'W20';'uint32',1,'W21';'uint32',1,'W22';'uint32',1,'W23';'uint32',1,'W24';'uint32',1,'W25';'uint32',1,'W26';'uint32',1,'W27';'uint32',1,'W28';'uint32',1,'W29';'uint32',1,'W30';'uint32',1,'W31';'uint32',1,'W32';'uint32',1,'W33';'uint32',1,'W34';'uint32',1,'W35';'uint32',1,'W36';'uint32',1,'W37';'uint32',1,'W38';'uint32',1,'W39';'uint32',1,'W40';'uint32',1,'W41';'uint32',1,'W42';'uint32',1,'W43';'uint32',1,'W44';'uint32',1,'W45';'uint32',1,'W46';'uint32',1,'W47';'uint32',1,'W48';'uint32',1,'W49';'uint32',1,'W50';'uint32',1,'W51';'uint32',1,'W52';'uint32',1,'W53';'uint32',1,'W54';'uint32',1,'W55';'uint32',1,'W56';'uint32',1,'W57';'uint32',1,'W58';'uint32',1,'W59';'uint32',1,'W60';'uint32',1,'W61';'uint32',1,'W62';'uint32',1,'W63';'uint32',1,'W64'});
-%         cal = map.Data;
-%         clear map;
-%         delete('temp.goes');
-%     catch exception
-%         cal = NaN;
-%         char(exception.message);
-%     end
-% end
 
-% function [data,err] = getDATA(fileName)
-%     err = NaN;
-%     % Temp file
-%     try
-%         fid = fopen(fileName,'rb');
-%         data = fread(fid,256);
-%         fclose(fid);
-%         fid = fopen('temp.goes','wb');
-%         fwrite(fid,data);
-%         fclose(fid);
-%         map = memmapfile('temp.goes','Format',{'uint32',1,'W1';'uint32',1,'W2';'uint32',1,'W3';'uint32',1,'W4';'uint32',1,'W5';'uint32',1,'W6';'uint32',1,'W7';'uint32',1,'W8';'uint32',1,'W9';'uint32',1,'W10';'uint32',1,'W11';'uint32',1,'W12';'uint32',1,'W13';'uint32',1,'W14';'uint32',1,'W15';'uint32',1,'W16';'uint32',1,'W17';'uint32',1,'W18';'uint32',1,'W19';'uint32',1,'W20';'uint32',1,'W21';'uint32',1,'W22';'uint32',1,'W23';'uint32',1,'W24';'uint32',1,'W25';'uint32',1,'W26';'uint32',1,'W27';'uint32',1,'W28';'uint32',1,'W29';'uint32',1,'W30';'uint32',1,'W31';'uint32',1,'W32';'uint32',1,'W33';'uint32',1,'W34';'uint32',1,'W35';'uint32',1,'W36';'uint32',1,'W37';'uint32',1,'W38';'uint32',1,'W39';'uint32',1,'W40';'uint32',1,'W41';'uint32',1,'W42';'uint32',1,'W43';'uint32',1,'W44';'uint32',1,'W45';'uint32',1,'W46';'uint32',1,'W47';'uint32',1,'W48';'uint32',1,'W49';'uint32',1,'W50';'uint32',1,'W51';'uint32',1,'W52';'uint32',1,'W53';'uint32',1,'W54';'uint32',1,'W55';'uint32',1,'W56';'uint32',1,'W57';'uint32',1,'W58';'uint32',1,'W59';'uint32',1,'W60';'uint32',1,'W61';'uint32',1,'W62';'uint32',1,'W63';'uint32',1,'W64'});
-%         data = map.Data;
-%         clear map;
-%         delete('temp.goes');
-%     catch exception
-%         data = NaN;
-%         char(exception.message);
-%     end
-% end
+function[data] = filtrateData(data,temp)
+    data(data<temp) = 0;
+%     data(data<(temp-1)) = 0;
+%     data(data>(temp+1)) = 0;
+end
+
+function findOverlapping(data,error)
+    total = length(data(:,1,1))*length(data(1,:,1));
+    for i=2:length(data(1,1,:))
+        tmp = data(:,:,i)-data(:,:,i-1);
+        n = sum(sum(abs(abs(tmp)<=error)));
+        if (n/total)<0.5
+            disp(num2str(i));
+        end
+    end
+end
