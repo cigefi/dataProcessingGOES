@@ -5,7 +5,7 @@ function MCSDetection(dirName,extra)
         dirName = strrep(dirName,'\','/'); % Clean dirName var
     end
     vars = [];
-    tempVec = [];
+    tempVec = [200];
     temp = java.lang.String(dirName(1)).split('/');
     temp = temp(end).split('_');
     var2Read = char(temp(1)); % Default value is taken from the path
@@ -15,8 +15,6 @@ function MCSDetection(dirName,extra)
         case 2 
             if ~mod(length(extra),2)
                 tmp = reshape(extra,2,[])'; 
-                tempVec = [];
-                vars = [];
                 for i=1:1:length(tmp(:,1))
                     switch lower(char(tmp{i,1}))
 %                         case 'f'
@@ -65,6 +63,20 @@ function MCSDetection(dirName,extra)
         logPath = logPath.concat('/');
     end
     
-    processing = 0;
-    out = []; % Temp var to save the data of the previous December
+    IR4 = [];
+    out = [];
+    for f = 3:length(dirData)
+        fileT = path.concat(dirData(f).name);
+        if(fileT.substring(fileT.lastIndexOf('/')+1).equalsIgnoreCase('IR4.mat'))
+            load(char(fileT));
+            for z=1:length(IR4(1,1,:))
+                for i=1:length(tempVec)
+                    [nT,~] = filtrateTemp(IR4(:,:,z),tempVec(i));
+                    if ~isempty(nT)
+                        out = cat(3,out,nT);
+                    end
+                end 
+            end
+        end
+    end
 end
