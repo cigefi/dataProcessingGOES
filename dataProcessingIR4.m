@@ -57,7 +57,6 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                 disp(e.message);
                 continue;
             end
-            
         %if lio == -1
             try
                 prodata = [];
@@ -73,7 +72,13 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                             else
                                 posZ = 1;
                             end
-                            newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
+                            newTimeStamp = cell(1,5);
+                            newTimeStamp{1} = getDate(num2str(area.W4));
+                            newTimeStamp{2} = getTime(num2str(area.W5));
+                            newTimeStamp{3} = area.W33;
+                            newTimeStamp{4} = posZ;
+                            newTimeStamp{5} = lenZ;
+%                             newTimeStamp = [getDate(num2str(area.W4)) area.W5 area.W33 posZ lenZ];
                             tlIR4 = cat(1,tlIR4,newTimeStamp);
                         case 'VIS'
                             if ~isempty(VIS)
@@ -81,7 +86,13 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                             else
                                 posZ = 1;
                             end
-                            newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
+                            newTimeStamp = cell(1,5);
+                            newTimeStamp{1} = getDate(num2str(area.W4));
+                            newTimeStamp{2} = getTime(num2str(area.W5));
+                            newTimeStamp{3} = area.W33;
+                            newTimeStamp{4} = posZ;
+                            newTimeStamp{5} = lenZ;
+%                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
                             tlVIS = cat(1,tlVIS,newTimeStamp);
                         case 'WV3'
                             if ~isempty(WV)
@@ -89,7 +100,13 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                             else
                                 posZ = 1;
                             end
-                            newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
+                            newTimeStamp = cell(1,5);
+                            newTimeStamp{1} = getDate(num2str(area.W4));
+                            newTimeStamp{2} = getTime(num2str(area.W5));
+                            newTimeStamp{3} = area.W33;
+                            newTimeStamp{4} = posZ;
+                            newTimeStamp{5} = lenZ;
+%                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
                             tlWV = cat(1,tlWV,newTimeStamp);
                     end
                     
