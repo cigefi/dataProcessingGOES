@@ -1,7 +1,6 @@
 function date = getDate(stamp)
     months = [31,28,31,30,31,30,31,31,30,31,30,31];
     day = str2num(stamp(end-2:end));
-    month = '';
     year = stamp(2:3);
     switch(stamp(1))
         case '0'
