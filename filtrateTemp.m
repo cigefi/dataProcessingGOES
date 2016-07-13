@@ -1,6 +1,7 @@
 function[data,data2] = filtrateTemp(data,temp,err)
     data(data<(temp-err)) = 0;
     data(data>(temp+err)) = 0;
+    data2 = data(:,:);
     for i=1:length(data(:,1))
         for j=1:length(data(1,:))
             temp = data(:,:);
@@ -23,7 +24,7 @@ function[data,data2] = filtrateTemp(data,temp,err)
                 end
                 temp(i,j) = 0;
                 cof = temp(fr:lr,fc:lc);
-                if ~hasNeighbors(cof)%~hasNeighbors(cof)
+                if ~hasNeighbors(cof)
                     %data2(i,j) = data(i,j);
                     data2(i,j) = 0;
                 end
@@ -33,7 +34,7 @@ function[data,data2] = filtrateTemp(data,temp,err)
 end
 
 function [res] = hasNeighbors(data)
-    if sum(data~=0)>0
+    if sum(sum(data~=0))>0
         res = 1;
     else
         res = 0;
