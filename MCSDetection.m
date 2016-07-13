@@ -8,7 +8,7 @@ function MCSDetection(dirName,extra)
     tempVec = [200];
     temp = java.lang.String(dirName(1)).split('/');
     temp = temp(end).split('_');
-    var2Read = char(temp(1)); % Default value is taken from the path
+    var2Read = 'IR4'; % Default value IR4
 %     yearZero = 0; % Default value
 %     yearN = 0; % Default value
     switch nargin
@@ -63,15 +63,23 @@ function MCSDetection(dirName,extra)
         logPath = logPath.concat('/');
     end
     
-    IR4 = [];
+    data = [];
     out = [];
     for f = 3:length(dirData)
         fileT = path.concat(dirData(f).name);
-        if(fileT.substring(fileT.lastIndexOf('/')+1).equalsIgnoreCase('IR4.mat'))
+        if(fileT.substring(fileT.lastIndexOf('/')+1).equalsIgnoreCase(strcat(var2Read,'.mat')))
             load(char(fileT));
-            for z=1:length(IR4(1,1,:))
+            switch(var2Read)
+                case 'IR4'
+                    data = IR4;
+                case 'VIS'
+                    data = VIS;
+                case 'WV'
+                    data = WV;
+            end
+            for z=1:length(data(1,1,:))
                 for i=1:length(tempVec)
-                    [nT,~] = filtrateTemp(IR4(:,:,z),tempVec(i));
+                    [nT,~] = filtrateTemp(data(:,:,z),tempVec(i));
                     if ~isempty(nT)
                         out = cat(3,out,nT);
                     end
