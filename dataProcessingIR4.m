@@ -273,6 +273,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                     end
                 end
                 disp(exception.message);
+                disp(char(fileT));
                 continue;
             end
         else
