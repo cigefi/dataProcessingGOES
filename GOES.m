@@ -14,19 +14,19 @@ function [] = GOES(dirName)
     end
     [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName);
     if ~isempty(IR4)
-        save(char(savePath.concat('IR4.mat')),'IR4');
+        save(char(savePath.concat('IR4.mat')),'IR4','-v7.3');
     end
     if ~isempty(tlIR4)
         save(char(savePath.concat('IR4-timeline.mat')),'tlIR4');
     end
     if ~isempty(VIS)
-        save(char(savePath.concat('VIS.mat')),'VIS');
+        save(char(savePath.concat('VIS.mat')),'VIS','-v7.3');
     end
     if ~isempty(tlVIS)
         save(char(savePath.concat('VIS-timeline.mat')),'tlVIS');
     end
     if ~isempty(WV)
-        save(char(savePath.concat('WV.mat')),'WV');
+        save(char(savePath.concat('WV.mat')),'WV','-v7.3');
     end
     if ~isempty(tlWV)
         save(char(savePath.concat('WV-timeline.mat')),'tlWV');

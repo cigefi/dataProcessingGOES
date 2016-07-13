@@ -1,6 +1,6 @@
-function[data,data2] = filtrateTemp(data,temp)
-    data(data<(temp-1)) = 0;
-    data(data>(temp+1)) = 0;
+function[data,data2] = filtrateTemp(data,temp,err)
+    data(data<(temp-err)) = 0;
+    data(data>(temp+err)) = 0;
     for i=1:length(data(:,1))
         for j=1:length(data(1,:))
             temp = data(:,:);
