@@ -258,7 +258,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                     %GOES = cat(3,GOES,prodata);
                 end
                 fid = fopen(strcat(char(logPath),'log.txt'), 'at+');
-                fprintf(fid, '[SAVED][%s] %s\n\n',char(datestr(now)),char(fileT));
+                fprintf(fid, '[SAVED][%s] %s\n',char(datestr(now)),char(fileT));
                 fclose(fid);
 %                 disp(char(strcat({'Data saved: '},char(fileT))));
                 delete(char(fileT));
@@ -267,7 +267,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                 if(exist(char(logPath),'dir'))
                     try
                         fid = fopen(strcat(char(logPath),'log.txt'), 'at+');
-                        fprintf(fid, '[ERROR][%s] %s\n %s\n\n',char(datestr(now)),char(fileT),char(exception.message));
+                        fprintf(fid, '[ERROR][%s] %s\n %s\n',char(datestr(now)),char(fileT),char(exception.message));
                         fclose(fid);
                     catch
                     end
