@@ -257,7 +257,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
 %                             save(char(savePath.concat('IR4.mat')),'IR4','-v7.3');
                             n = getFilesCount(savePath,'IR4');
                             save(char(savePath.concat(strcat('IR4-',num2str(n),'.mat'))),'IR4','-v7.3');
-                            disp(char(strcat(num2str(length(IR4(1,1,:))),{' IR4 saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
+                            disp(char(strcat(num2str(length(IR4(1,1,:))*n),{' IR4 saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
                             try
                                 clear IR4;
                             catch
@@ -290,7 +290,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
 %                             save(char(savePath.concat('VIS.mat')),'VIS','-v7.3');
                             n = getFilesCount(savePath,'VIS');
                             save(char(savePath.concat(strcat('VIS-',num2str(n),'.mat'))),'VIS','-v7.3');
-                            disp(char(strcat(num2str(length(VIS(1,1,:))),{' VIS saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
+                            disp(char(strcat(num2str(length(VIS(1,1,:))*n),{' VIS saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
                             try
                                 clear VIS;
                             catch
@@ -323,7 +323,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
 %                             save(char(savePath.concat('WV.mat')),'WV','-v7.3');
                             n = getFilesCount(savePath,'WV');
                             save(char(savePath.concat(strcat('WV-',num2str(n),'.mat'))),'WV','-v7.3');
-                            disp(char(strcat(num2str(length(WV(1,1,:))),{' WV saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
+                            disp(char(strcat(num2str(length(WV(1,1,:))*n),{' WV saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
                             try
                                 clear WV;
                             catch
@@ -486,24 +486,4 @@ function findOverlapping(data,error)
             disp(num2str(i));
         end
     end
-end
-
-function [n] = getFilesCount(path,root)
-    n = 0;
-    dirData = dir(char(path));
-    for f = 3:length(dirData)
-        fileT = path.concat(dirData(f).name);
-        ext = fileT.substring(fileT.lastIndexOf('.')+1);
-        if(ext.equalsIgnoreCase('mat'))
-            try
-                name = fileT.substring(fileT.lastIndexOf('/')+1,fileT.lastIndexOf('-'));
-                if name.equals(root)
-                    n = n + 1;
-                end
-            catch
-                continue;
-            end
-        end
-     end
-     n  = n + 1;
 end
