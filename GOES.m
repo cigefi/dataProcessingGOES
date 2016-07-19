@@ -1,7 +1,17 @@
-function [] = GOES(dirName)
+% GOES
+% Function capable of process a bunch of McIDAS (Man computer Interactive Data
+% Access System) files. Variables: IR4, VIS, and WV.
+%
+% Prototype:
+%           GOES(dirName,joinFiles)
+% dirName (required) = must be a cell-array of the form {'PATH-IN','PATH-OUT'}
+% joinFiles (optional) = is an optional flag, must be an binary value, if 1 (true)
+% then at the end of the routine the files will be merged.
+function [] = GOES(dirName,joinFiles)
     if nargin < 1
         error('GOES: dirName is a required input')
-    else
+    elseif nargin < 2
+        joinFiles = 0; % Default value
         dirName = strrep(dirName,'\','/'); % Clean dirName var
     end
     if(length(dirName)>1)
@@ -42,5 +52,17 @@ function [] = GOES(dirName)
         n = getFilesCount(savePath,'tlWV');
         save(char(savePath.concat(strcat('tlWV-',num2str(n),'.mat'))),'tlWV','-v7.3');
         %save(char(savePath.concat('WV-timeline.mat')),'tlWV');
+    end
+    if joinFiles
+        try
+            filesJoin(savePath,'IR4');
+            filesJoin(savePath,'tlIR4',1);
+            filesJoin(savePath,'VIS');
+            filesJoin(savePath,'tlVIS',1);
+            filesJoin(savePath,'WV');
+            filesJoin(savePath,'tlWV',1);
+        catch e
+            disp(e.message);
+        end 
     end
 end
