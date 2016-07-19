@@ -22,7 +22,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
     
     dirData = dir(char(dirName(1)));  % Get the data for the current directory
     path = java.lang.String(dirName(1));
-    sTop = 49;
+    sTop = 99;
     if(path.charAt(path.length-1) ~= '/')
         path = path.concat('/');
     end
@@ -67,6 +67,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                     data = fread(fid);
                     fclose(fid);
                     lenZ = area.W14;
+                    n = getFilesCount(savePath,var2Read);
                     switch (var2Read)
                         case 'IR4'
                             if ~isempty(IR4)
@@ -78,7 +79,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                             newTimeStamp{1} = getDate(num2str(area.W4));
                             newTimeStamp{2} = getTime(num2str(area.W5));
                             newTimeStamp{3} = area.W33;
-                            newTimeStamp{4} = posZ;
+                            newTimeStamp{4} = posZ + (n-1)*100;
                             newTimeStamp{5} = lenZ;
 %                             newTimeStamp = [getDate(num2str(area.W4)) area.W5 area.W33 posZ lenZ];
                             tlIR4 = cat(1,tlIR4,newTimeStamp);
@@ -255,7 +256,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
 %                                 IR4 = cat(3,tmp.('IR4'),IR4);
 %                             end
 %                             save(char(savePath.concat('IR4.mat')),'IR4','-v7.3');
-                            n = getFilesCount(savePath,'IR4');
+                            %n = getFilesCount(savePath,'IR4');
                             save(char(savePath.concat(strcat('IR4-',num2str(n),'.mat'))),'IR4','-v7.3');
                             disp(char(strcat(num2str(length(IR4(1,1,:))*n),{' IR4 saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
                             try
@@ -271,7 +272,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
 %                                 tlIR4 = cat(1,tmp.('tlIR4'),tlIR4);
 %                             end
 %                             save(char(savePath.concat('tlIR4.mat')),'tlIR4','-v7.3');
-                            n = getFilesCount(savePath,'tlIR4');
+                            %n = getFilesCount(savePath,'tlIR4');
                             save(char(savePath.concat(strcat('tlIR4-',num2str(n),'.mat'))),'tlIR4','-v7.3');
                             try
                                 clear tlIR4;
@@ -288,7 +289,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
 %                                 VIS = cat(3,tmp.('VIS'),VIS);
 %                             end
 %                             save(char(savePath.concat('VIS.mat')),'VIS','-v7.3');
-                            n = getFilesCount(savePath,'VIS');
+                            %n = getFilesCount(savePath,'VIS');
                             save(char(savePath.concat(strcat('VIS-',num2str(n),'.mat'))),'VIS','-v7.3');
                             disp(char(strcat(num2str(length(VIS(1,1,:))*n),{' VIS saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
                             try
@@ -304,7 +305,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
 %                                 tlVIS = cat(1,tmp.('tlVIS'),tlVIS);
 %                             end
 %                             save(char(savePath.concat('tlVIS.mat')),'tlVIS','-v7.3');
-                            n = getFilesCount(savePath,'tlVIS');
+                            %n = getFilesCount(savePath,'tlVIS');
                             save(char(savePath.concat(strcat('tlVIS-',num2str(n),'.mat'))),'tlVIS','-v7.3');
                             try
                                 clear tlVIS;
@@ -321,7 +322,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
 %                                 WV = cat(3,tmp.('WV'),WV);
 %                             end
 %                             save(char(savePath.concat('WV.mat')),'WV','-v7.3');
-                            n = getFilesCount(savePath,'WV');
+                            %n = getFilesCount(savePath,'WV');
                             save(char(savePath.concat(strcat('WV-',num2str(n),'.mat'))),'WV','-v7.3');
                             disp(char(strcat(num2str(length(WV(1,1,:))*n),{' WV saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
                             try
@@ -337,7 +338,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
 %                                 tlWV = cat(1,tmp.('tlWV'),tlWV);
 %                             end
 %                             save(char(savePath.concat('tlWV.mat')),'tlWV','-v7.3');
-                            n = getFilesCount(savePath,'tlWV');
+                            %n = getFilesCount(savePath,'tlWV');
                             save(char(savePath.concat(strcat('tlWV-',num2str(n),'.mat'))),'tlWV','-v7.3');
                             try
                                 clear tlWV;
@@ -389,7 +390,7 @@ function [areaDir,err] = getAreaDirectory(fileName)
         map = memmapfile('area-dir.goes','Format',{'uint32',1,'W1';'uint32',1,'W2';'uint32',1,'W3';'uint32',1,'W4';'uint32',1,'W5';'uint32',1,'W6';'uint32',1,'W7';'uint32',1,'W8';'uint32',1,'W9';'uint32',1,'W10';'uint32',1,'W11';'uint32',1,'W12';'uint32',1,'W13';'uint32',1,'W14';'uint32',1,'W15';'uint32',1,'W16';'uint32',1,'W17';'uint32',1,'W18';'uint32',1,'W19';'uint32',1,'W20';'uint32',1,'W21';'uint32',1,'W22';'uint32',1,'W23';'uint32',1,'W24';'uint8',[4 1],'W25';'uint8',[4 1],'W26';'uint8',[4 1],'W27';'uint8',[4 1],'W28';'uint8',[4 1],'W29';'uint8',[4 1],'W30';'uint8',[4 1],'W31';'uint32',1,'W32';'uint32',1,'W33';'uint32',1,'W34';'uint32',1,'W35';'uint32',1,'W36';'uint32',1,'W37';'uint32',1,'W38';'uint32',1,'W39';'uint32',1,'W40';'uint32',1,'W41';'uint32',1,'W42';'uint32',1,'W43';'uint32',1,'W44';'uint32',1,'W45';'uint32',1,'W46';'uint32',1,'W47';'uint32',1,'W48';'uint32',1,'W49';'uint32',1,'W50';'uint32',1,'W51';'uint8',[4 1],'W52';'uint8',[4 1],'W53';'uint32',1,'W54';'uint32',1,'W55';'uint32',1,'W56';'uint32',1,'W57';'uint32',1,'W58';'uint32',1,'W59';'uint32',1,'W60';'uint32',1,'W61';'uint32',1,'W62';'uint32',1,'W63';'uint32',1,'W64'});
         areaDir = map.Data;
         clear map;
-        delete('area-dir.goes');
+        %delete('area-dir.goes');
     catch exception
         areaDir = NaN;
         char(exception.message);
