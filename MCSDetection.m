@@ -5,12 +5,11 @@ function MCSDetection(dirName,extra)
         dirName = strrep(dirName,'\','/'); % Clean dirName var
     end
     vars = [];
-    tempVec = [200];
-    temp = java.lang.String(dirName(1)).split('/');
-    temp = temp(end).split('_');
+    tempVec = 220;
+    toleVec = 20;
+%     temp = java.lang.String(dirName(1)).split('/');
+%     temp = temp(end).split('_');
     var2Read = 'IR4'; % Default value IR4
-%     yearZero = 0; % Default value
-%     yearN = 0; % Default value
     switch nargin
         case 2 
             if ~mod(length(extra),2)
@@ -52,32 +51,52 @@ function MCSDetection(dirName,extra)
     if(logPath.charAt(logPath.length-1) ~= '/')
         logPath = logPath.concat('/');
     end
-    
-    data = [];
+
     out = [];
     for f = 3:length(dirData)
         fileT = path.concat(dirData(f).name);
-        if(fileT.substring(fileT.lastIndexOf('/')+1,fileT.lastIndexOf('-')).concat('.mat').equalsIgnoreCase(strcat(var2Read,'.mat')))
-            load(char(fileT));
-            switch(var2Read)
-                case 'IR4'
-                    data = IR4(:,:,:);
-                    try
-                        clear IR4;
-                    catch
-                    end
-                case 'VIS'
-                    data = VIS;
-                case 'WV'
-                    data = WV;
+        try
+            name = fileT.substring(fileT.lastIndexOf('/')+1,fileT.lastIndexOf('-')).concat('.mat');
+            nameTS = strcat('tl',var2Read,char(fileT.substring(fileT.lastIndexOf('-'))));
+        catch
+            try
+                name = fileT.substring(fileT.lastIndexOf('/')+1).concat('.mat');
+                nameTS = strcat('tl',var2Read,'.mat');
+            catch
+                continue;
             end
-            for z=1:length(data(1,1,:))
-                for i=1:length(tempVec)
-                    [nT,nF] = filtrateTemp(data(:,:,z),tempVec(i));
-                    if ~isempty(nT)
-                        out = cat(3,out,nT);
-                    end
-                end 
+        end
+        if(name.equalsIgnoreCase(strcat(var2Read,'.mat')))
+            try
+                tmp = load(char(fileT));
+                data = tmp.(var2Read)(:,:,:);
+                try
+                    clear tmp;
+                catch
+                end
+                tmp = load(char(path.concat(nameTS)));
+                timeStamp = tmp.(strcat('tl',var2Read))(:,:);
+                try
+                    clear tmp;
+                catch
+                end
+                for z=1:length(data(1,1,:))
+                    for t=1:length(tempVec)
+                        [~,nF] = filtrateTemp(data(:,:,z),tempVec(t),toleVec(t));
+                        if sum(sum(nF>0))>0
+                            newMCS = cell(1,2);
+                            newMCS{1} = nF;
+                            newMCS{2} = timeStamp(f,1:2);
+                            out = cat(1,out,newMCS);
+                        end
+                    end 
+                end
+                if ~isempty(out)
+                    newName = path.concat(strcat({'[MCS] '},name));
+                    save(newName,'tlIR4','-v7.3');
+                end
+            catch e
+                disp(e.message);
             end
         end
     end
