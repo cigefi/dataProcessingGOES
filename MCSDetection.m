@@ -17,16 +17,6 @@ function MCSDetection(dirName,extra)
                 tmp = reshape(extra,2,[])'; 
                 for i=1:1:length(tmp(:,1))
                     switch lower(char(tmp{i,1}))
-%                         case 'f'
-%                             val = tmp{i,2};
-%                             if length(val) == 1
-%                                 yearZero = val;%str2double(char(val));
-%                             end
-%                         case 'l'
-%                             val = tmp{i,2};
-%                             if length(val) == 1
-%                                 yearN = val;%str2double(char(val));
-%                             end
                         case 'temp'
                             tempVec = tmp{i,2};
                         case 'var2read'
@@ -67,11 +57,15 @@ function MCSDetection(dirName,extra)
     out = [];
     for f = 3:length(dirData)
         fileT = path.concat(dirData(f).name);
-        if(fileT.substring(fileT.lastIndexOf('/')+1).equalsIgnoreCase(strcat(var2Read,'.mat')))
+        if(fileT.substring(fileT.lastIndexOf('/')+1,fileT.lastIndexOf('-')).concat('.mat').equalsIgnoreCase(strcat(var2Read,'.mat')))
             load(char(fileT));
             switch(var2Read)
                 case 'IR4'
-                    data = IR4;
+                    data = IR4(:,:,:);
+                    try
+                        clear IR4;
+                    catch
+                    end
                 case 'VIS'
                     data = VIS;
                 case 'WV'
@@ -79,7 +73,7 @@ function MCSDetection(dirName,extra)
             end
             for z=1:length(data(1,1,:))
                 for i=1:length(tempVec)
-                    [nT,~] = filtrateTemp(data(:,:,z),tempVec(i));
+                    [nT,nF] = filtrateTemp(data(:,:,z),tempVec(i));
                     if ~isempty(nT)
                         out = cat(3,out,nT);
                     end
