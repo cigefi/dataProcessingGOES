@@ -27,6 +27,9 @@ function MCSDetection(dirName,extra)
                 end
             end
     end
+    if length(tempVec) ~= length(toleVec)
+        error('MCSDetection: the lengths of temps and tolerances, must be the same');
+    end
     dirData = dir(char(dirName(1)));  % Get the data for the current directory
     path = java.lang.String(dirName(1));
     if(path.charAt(path.length-1) ~= '/')
@@ -50,6 +53,12 @@ function MCSDetection(dirName,extra)
 	end
     if(logPath.charAt(logPath.length-1) ~= '/')
         logPath = logPath.concat('/');
+    end
+    if ~exist(char(savePath),'dir')
+        mkdir(char(savePath));
+    end
+    if ~exist(char(logPath),'dir')
+        mkdir(char(logPath));
     end
 
     out = [];
@@ -82,21 +91,30 @@ function MCSDetection(dirName,extra)
                 end
                 for z=1:length(data(1,1,:))
                     for t=1:length(tempVec)
+                        %disp(char(strcat({'Processing files for: '},num2str(tempVec(t)),'+-',num2str(toleVec(t)),{' K'})));
                         [~,nF] = filtrateTemp(data(:,:,z),tempVec(t),toleVec(t));
                         if sum(sum(nF>0))>0
                             newMCS = cell(1,2);
                             newMCS{1} = nF;
-                            newMCS{2} = timeStamp(f,1:2);
+                            newMCS{2} = timeStamp(z,1:2);
                             out = cat(1,out,newMCS);
                         end
-                    end 
+                    end
+                    disp(num2str(z));
                 end
                 if ~isempty(out)
-                    newName = path.concat(strcat({'[MCS] '},name));
-                    save(newName,'tlIR4','-v7.3');
+                    newName = savePath.concat(strcat({'[MCS] '},char(name)));
+                    S.(var2Read) = out;
+                    save(char(newName),'-struct','S','-v7.3');
                 end
             catch e
                 disp(e.message);
+                try
+                    fid = fopen(strcat(char(logPath),'log.txt'), 'at+');
+                    fprintf(fid, '[ERROR][%s] %s\n %s\n',char(datestr(now)),char(fileT),char(exception.message));
+                    fclose(fid);
+                catch
+                end
             end
         end
     end
