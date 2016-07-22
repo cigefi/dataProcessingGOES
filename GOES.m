@@ -26,6 +26,7 @@ function [] = GOES(dirName,joinFiles)
     if ~isempty(IR4)
         n = getFilesCount(savePath,'IR4');
         save(char(savePath.concat(strcat('IR4-',num2str(n),'.mat'))),'IR4','-v7.3');
+        disp('IR4 files processed');
         %save(char(savePath.concat('IR4.mat')),'IR4','-v7.3');
     end
     if ~isempty(tlIR4)
@@ -36,6 +37,7 @@ function [] = GOES(dirName,joinFiles)
     if ~isempty(VIS)
         n = getFilesCount(savePath,'VIS');
         save(char(savePath.concat(strcat('VIS-',num2str(n),'.mat'))),'VIS','-v7.3');
+        disp('VIS files processed');
         %save(char(savePath.concat('VIS.mat')),'VIS','-v7.3');
     end
     if ~isempty(tlVIS)
@@ -46,6 +48,7 @@ function [] = GOES(dirName,joinFiles)
     if ~isempty(WV3)
         n = getFilesCount(savePath,'WV3');
         save(char(savePath.concat(strcat('WV3-',num2str(n),'.mat'))),'WV3','-v7.3');
+        disp('WV3 files processed');
         %save(char(savePath.concat('WV3.mat')),'WV3','-v7.3');
     end
     if ~isempty(tlWV3)
