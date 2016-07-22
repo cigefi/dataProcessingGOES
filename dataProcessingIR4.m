@@ -79,7 +79,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
                             newTimeStamp{1} = getDate(num2str(area.W4));
                             newTimeStamp{2} = getTime(num2str(area.W5));
                             newTimeStamp{3} = area.W33;
-                            newTimeStamp{4} = posZ + (n-1)*100;
+                            newTimeStamp{4} = posZ + (n-1)*(sTop+1);
                             newTimeStamp{5} = lenZ;
 %                             newTimeStamp = [getDate(num2str(area.W4)) area.W5 area.W33 posZ lenZ];
                             tlIR4 = cat(1,tlIR4,newTimeStamp);
@@ -93,7 +93,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
                             newTimeStamp{1} = getDate(num2str(area.W4));
                             newTimeStamp{2} = getTime(num2str(area.W5));
                             newTimeStamp{3} = area.W33;
-                            newTimeStamp{4} = posZ + (n-1)*100;
+                            newTimeStamp{4} = posZ + (n-1)*(sTop+1);
                             newTimeStamp{5} = lenZ;
 %                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
                             tlVIS = cat(1,tlVIS,newTimeStamp);
@@ -107,7 +107,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
                             newTimeStamp{1} = getDate(num2str(area.W4));
                             newTimeStamp{2} = getTime(num2str(area.W5));
                             newTimeStamp{3} = area.W33;
-                            newTimeStamp{4} = posZ + (n-1)*100;
+                            newTimeStamp{4} = posZ + (n-1)*(sTop+1);
                             newTimeStamp{5} = lenZ;
 %                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
                             tlWV3 = cat(1,tlWV3,newTimeStamp);
@@ -259,7 +259,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
 %                             save(char(savePath.concat('IR4.mat')),'IR4','-v7.3');
                             %n = getFilesCount(savePath,'IR4');
                             save(char(savePath.concat(strcat('IR4-',num2str(n),'.mat'))),'IR4','-v7.3');
-                            disp(char(strcat(num2str(length(IR4(1,1,:))*n),{' IR4 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-3),')')));
+                            disp(char(strcat(num2str(length(IR4(1,1,:))*n),{' IR4 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
                             try
                                 clear IR4;
                             catch
@@ -292,7 +292,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
 %                             save(char(savePath.concat('VIS.mat')),'VIS','-v7.3');
                             %n = getFilesCount(savePath,'VIS');
                             save(char(savePath.concat(strcat('VIS-',num2str(n),'.mat'))),'VIS','-v7.3');
-                            disp(char(strcat(num2str(length(VIS(1,1,:))*n),{' VIS saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-3),')')));
+                            disp(char(strcat(num2str(length(VIS(1,1,:))*n),{' VIS saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
                             try
                                 clear VIS;
                             catch
@@ -325,7 +325,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
 %                             save(char(savePath.concat('WV3.mat')),'WV3','-v7.3');
                             %n = getFilesCount(savePath,'WV3');
                             save(char(savePath.concat(strcat('WV3-',num2str(n),'.mat'))),'WV3','-v7.3');
-                            disp(char(strcat(num2str(length(WV3(1,1,:))*n),{' WV3 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-3),')')));
+                            disp(char(strcat(num2str(length(WV3(1,1,:))*n),{' WV3 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
                             try
                                 clear WV3;
                             catch
