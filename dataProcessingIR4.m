@@ -181,7 +181,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
                     rawdata = fread(fid);
                     fclose(fid);
                     if lpre == 0
-                        prodata = reshape(rawdata,[],nele);%ldatasec,[]);
+                        prodata = flipud(reshape(rawdata,nele,[])');%ldatasec,[]);
                     else
                         for i=1:length(nlines)
                             offset = lines*(i-1);

@@ -4,11 +4,10 @@ function MCSDetection(dirName,extra)
     else
         dirName = strrep(dirName,'\','/'); % Clean dirName var
     end
+    rainyDays = [];
     vars = [];
-    tempVec = 220;
-    toleVec = 20;
-%     temp = java.lang.String(dirName(1)).split('/');
-%     temp = temp(end).split('_');
+    tempVec = 215;
+    toleVec = 25;
     var2Read = 'IR4'; % Default value IR4
     switch nargin
         case 2 
@@ -16,6 +15,8 @@ function MCSDetection(dirName,extra)
                 tmp = reshape(extra,2,[])'; 
                 for i=1:1:length(tmp(:,1))
                     switch lower(char(tmp{i,1}))
+                        case 'rainydays'
+                            rainyDays = tmp{i,2};
                         case 'temp'
                             tempVec = tmp{i,2};
                         case 'var2read'
@@ -63,15 +64,18 @@ function MCSDetection(dirName,extra)
 
     out = [];
     cofIndex = [];
+    con = 1;
     for f = 3:length(dirData)
         fileT = path.concat(dirData(f).name);
         try
             name = fileT.substring(fileT.lastIndexOf('/')+1,fileT.lastIndexOf('-')).concat('.mat');
             nameTS = strcat('tl',var2Read,char(fileT.substring(fileT.lastIndexOf('-'))));
+            nName = fileT.substring(fileT.lastIndexOf('/')+1);
         catch
             try
                 name = fileT.substring(fileT.lastIndexOf('/')+1).concat('.mat');
                 nameTS = strcat('tl',var2Read,'.mat');
+                nName = name;
             catch
                 continue;
             end
@@ -122,17 +126,23 @@ function MCSDetection(dirName,extra)
                                     end
                                 end
                             end
-                            newMCS = cell(1,3);
+                            newMCS = cell(1,4);
                             newMCS{1} = nF;
                             newMCS{2} = timeStamp(z,1:2);
                             newMCS{3} = MCS;
+                            newMCS{4} = data(:,:,z);
                             out = cat(1,out,newMCS);
                         end
                     end
-%                     disp(num2str(z));
+                    rema = (length(dirData)-3)/2;
+                    if mod(rema,2)~=0 
+                        rema = (length(dirData)-4)/2;
+                    end
+                    disp(char(strcat({'Processed levels: '},num2str(z),{' (remaining images '},num2str(rema-con-2),')')));
                 end
+                con = con + 1; 
                 if ~isempty(out)
-                    newName = savePath.concat(strcat({'[MCS] '},char(name)));
+                    newName = savePath.concat(strcat({'[MCS] '},char(nName)));
                     S.(var2Read) = out;
                     save(char(newName),'-struct','S','-v7.3');
                 end
