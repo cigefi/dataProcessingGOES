@@ -62,6 +62,7 @@ function MCSDetection(dirName,extra)
     end
 
     out = [];
+    cofIndex = [];
     for f = 3:length(dirData)
         fileT = path.concat(dirData(f).name);
         try
@@ -89,18 +90,42 @@ function MCSDetection(dirName,extra)
                     clear tmp;
                 catch
                 end
+                if isempty(cofIndex)
+                    cofIndex = generateIndexMatrix(length(data(:,1,1)),length(data(1,:,1)));
+                else
+                    if length(data(:,1,1))~=length(cofIndex(:,1)) || length(data(1,:,1))~=length(cofIndex(1,:))
+                        cofIndex = generateIndexMatrix(length(data(:,1,1)),length(data(1,:,1)));
+                    end
+                end
                 for z=1:length(data(1,1,:))
                     for t=1:length(tempVec)
                         %disp(char(strcat({'Processing files for: '},num2str(tempVec(t)),'+-',num2str(toleVec(t)),{' K'})));
-                        [~,nF] = filtrateTemp(data(:,:,z),tempVec(t),toleVec(t));
-                        if sum(sum(nF>0))>0
-                            newMCS = cell(1,2);
+                        [nT,nF] = filtrateTemp(data(:,:,z),tempVec(t),toleVec(t));
+                        nFT = nF(:,:);
+                        MCS = [];
+                        if sum(sum(nFT>0))>0
+                            for j=1:length(nFT(:,1))
+                                if sum(nFT(j,:)>0)>0
+                                    cols = find(nFT(j,:)>0);
+                                    for c=1:length(cols)
+                                        [ele,nFT] = findNeighbors(nFT,[j,cols(c)],cofIndex);
+                                        nMCS = cell(1,3);
+                                        [lat,lon] = findCentroid(ele);
+                                        nMCS{1} = lat;
+                                        nMCS{2} = lon;
+                                        nMCS{3} = length(ele(:,1));
+                                        MCS = cat(1,MCS,nMCS);
+                                    end
+                                end
+                            end
+                            newMCS = cell(1,3);
                             newMCS{1} = nF;
                             newMCS{2} = timeStamp(z,1:2);
+                            newMCS{3} = MCS;
                             out = cat(1,out,newMCS);
                         end
                     end
-                    disp(num2str(z));
+%                     disp(num2str(z));
                 end
                 if ~isempty(out)
                     newName = savePath.concat(strcat({'[MCS] '},char(name)));
@@ -118,4 +143,18 @@ function MCSDetection(dirName,extra)
             end
         end
     end
+end
+
+function [cofIndex] = generateIndexMatrix(f,r)
+    cofIndex = cell(f,r);
+    for h=1:length(cofIndex(:,1))
+        for g=1:length(cofIndex(1,:))
+            cofIndex{h,g} = [h,g];
+        end
+    end
+end
+
+function [lat,lon] = findCentroid(MCS)
+    lat = median(MCS(:,1));
+    lon = median(MCS(:,2));
 end
