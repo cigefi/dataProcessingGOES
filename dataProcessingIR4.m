@@ -132,7 +132,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
                         fid2 = fopen('nav.goes','wb');
                         fwrite(fid2,data(area.W35+1:lpos));
                         fclose(fid2);
-                        [nav,~] = getNAV('nav.goes');
+%                         [nav,~] = getNAV('nav.goes');
                     end
                     % Calibration (CAL) block
                     if area.W63 > 0
@@ -173,7 +173,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
                         fid2 = fopen('audit.goes','wb');
                         fwrite(fid2,data(fpos:end));
                         fclose(fid2);
-                        [audit,~] = getAUDIT('audit.goes');
+%                         [audit,~] = getAUDIT('audit.goes');
                     end
                     %fclose(fid);
                     
@@ -259,7 +259,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
 %                             save(char(savePath.concat('IR4.mat')),'IR4','-v7.3');
                             %n = getFilesCount(savePath,'IR4');
                             save(char(savePath.concat(strcat('IR4-',num2str(n),'.mat'))),'IR4','-v7.3');
-                            disp(char(strcat(num2str(length(IR4(1,1,:))*n),{' IR4 saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
+                            disp(char(strcat(num2str(length(IR4(1,1,:))*n),{' IR4 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-3),')')));
                             try
                                 clear IR4;
                             catch
@@ -292,7 +292,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
 %                             save(char(savePath.concat('VIS.mat')),'VIS','-v7.3');
                             %n = getFilesCount(savePath,'VIS');
                             save(char(savePath.concat(strcat('VIS-',num2str(n),'.mat'))),'VIS','-v7.3');
-                            disp(char(strcat(num2str(length(VIS(1,1,:))*n),{' VIS saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
+                            disp(char(strcat(num2str(length(VIS(1,1,:))*n),{' VIS saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-3),')')));
                             try
                                 clear VIS;
                             catch
@@ -325,7 +325,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
 %                             save(char(savePath.concat('WV3.mat')),'WV3','-v7.3');
                             %n = getFilesCount(savePath,'WV3');
                             save(char(savePath.concat(strcat('WV3-',num2str(n),'.mat'))),'WV3','-v7.3');
-                            disp(char(strcat(num2str(length(WV3(1,1,:))*n),{' WV3 saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
+                            disp(char(strcat(num2str(length(WV3(1,1,:))*n),{' WV3 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-3),')')));
                             try
                                 clear WV3;
                             catch
