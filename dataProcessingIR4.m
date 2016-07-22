@@ -4,15 +4,15 @@
 %
 % dirName = Path of the directory that contents the files and path for the
 % processed files
-function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tlIR4,tlVIS,tlWV)
+function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3,tlIR4,tlVIS,tlWV3)
     switch nargin
         case 1
             IR4 = [];
             VIS = [];
-            WV = [];
+            WV3 = [];
             tlIR4 = [];
             tlVIS = [];
-            tlWV = [];
+            tlWV3 = [];
     end
     if nargin < 1
         error('dataProcessingIR4: dirName is a required input')
@@ -97,9 +97,9 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                             newTimeStamp{5} = lenZ;
 %                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
                             tlVIS = cat(1,tlVIS,newTimeStamp);
-                        case 'WV3'
-                            if ~isempty(WV)
-                                posZ = length(WV(1,1,:))+1;
+                        case 'WV33'
+                            if ~isempty(WV3)
+                                posZ = length(WV3(1,1,:))+1;
                             else
                                 posZ = 1;
                             end
@@ -110,7 +110,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                             newTimeStamp{4} = posZ;
                             newTimeStamp{5} = lenZ;
 %                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
-                            tlWV = cat(1,tlWV,newTimeStamp);
+                            tlWV3 = cat(1,tlWV3,newTimeStamp);
                         otherwise
                             disp(char(strcat(char(fileT),{' skipped file.'})));
                             continue;
@@ -244,8 +244,8 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                             IR4 = cat(3,IR4,prodata);
                         case 'VIS'
                             VIS = cat(3,VIS,prodata);
-                        case 'WV3'
-                            WV = cat(3,WV,prodata);
+                        case 'WV33'
+                            WV3 = cat(3,WV3,prodata);
                     end
 %                     if ~mod(f,100)
 %                         disp(char(strcat('Processed files ',{' '},num2str(f),{' of '},num2str(length(dirData)-3))));
@@ -316,37 +316,37 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
                             tlVIS = [];
                         end
                     end
-                    if ~isempty(WV)
-                        if length(WV(1,1,:))>sTop
-%                             if exist(char(savePath.concat('WV.mat')),'file')
-%                                 tmp = load(char(savePath.concat('WV.mat')),'WV');
-%                                 WV = cat(3,tmp.('WV'),WV);
+                    if ~isempty(WV3)
+                        if length(WV3(1,1,:))>sTop
+%                             if exist(char(savePath.concat('WV3.mat')),'file')
+%                                 tmp = load(char(savePath.concat('WV3.mat')),'WV3');
+%                                 WV3 = cat(3,tmp.('WV3'),WV3);
 %                             end
-%                             save(char(savePath.concat('WV.mat')),'WV','-v7.3');
-                            %n = getFilesCount(savePath,'WV');
-                            save(char(savePath.concat(strcat('WV-',num2str(n),'.mat'))),'WV','-v7.3');
-                            disp(char(strcat(num2str(length(WV(1,1,:))*n),{' WV saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
+%                             save(char(savePath.concat('WV3.mat')),'WV3','-v7.3');
+                            %n = getFilesCount(savePath,'WV3');
+                            save(char(savePath.concat(strcat('WV3-',num2str(n),'.mat'))),'WV3','-v7.3');
+                            disp(char(strcat(num2str(length(WV3(1,1,:))*n),{' WV3 saved files (Processed files '},{' '},num2str(f),{' of '},num2str(length(dirData)-3),')')));
                             try
-                                clear WV;
+                                clear WV3;
                             catch
-                                disp('Error, cannot delete var WV');
+                                disp('Error, cannot delete var WV3');
                             end
-                            WV = [];
+                            WV3 = [];
                         end
-                        if length(tlWV(:,1))>sTop
-%                             if exist(char(savePath.concat('tlWV.mat')),'file')
-%                                 tmp = load(char(savePath.concat('tlWV.mat')),'tlWV');
-%                                 tlWV = cat(1,tmp.('tlWV'),tlWV);
+                        if length(tlWV3(:,1))>sTop
+%                             if exist(char(savePath.concat('tlWV3.mat')),'file')
+%                                 tmp = load(char(savePath.concat('tlWV3.mat')),'tlWV3');
+%                                 tlWV3 = cat(1,tmp.('tlWV3'),tlWV3);
 %                             end
-%                             save(char(savePath.concat('tlWV.mat')),'tlWV','-v7.3');
-                            %n = getFilesCount(savePath,'tlWV');
-                            save(char(savePath.concat(strcat('tlWV-',num2str(n),'.mat'))),'tlWV','-v7.3');
+%                             save(char(savePath.concat('tlWV3.mat')),'tlWV3','-v7.3');
+                            %n = getFilesCount(savePath,'tlWV3');
+                            save(char(savePath.concat(strcat('tlWV3-',num2str(n),'.mat'))),'tlWV3','-v7.3');
                             try
-                                clear tlWV;
+                                clear tlWV3;
                             catch
-                                disp('Error, cannot delete var tlWV');
+                                disp('Error, cannot delete var tlWV3');
                             end
-                            tlWV = [];
+                            tlWV3 = [];
                         end
                     end
                     %GOES = cat(3,GOES,prodata);
@@ -373,7 +373,7 @@ function [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName,IR4,VIS,WV,tl
         else
             if isequal(dirData(f).isdir,1)
                 newPath = char(path.concat(dirData(f).name));
-                [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4({newPath,char(savePath.concat(dirData(f).name)),char(logPath)},IR4,VIS,WV,tlIR4,tlVIS,tlWV);
+                [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4({newPath,char(savePath.concat(dirData(f).name)),char(logPath)},IR4,VIS,WV3,tlIR4,tlVIS,tlWV3);
             end
         end
     end
