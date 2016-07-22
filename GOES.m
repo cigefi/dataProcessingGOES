@@ -1,6 +1,6 @@
 % GOES
 % Function capable of process a bunch of McIDAS (Man computer Interactive Data
-% Access System) files. Variables: IR4, VIS, and WV.
+% Access System) files. Variables: IR4, VIS, and WV33.
 %
 % Prototype:
 %           GOES(dirName,joinFiles)
@@ -22,7 +22,7 @@ function [] = GOES(dirName,joinFiles)
     if(savePath.charAt(savePath.length-1) ~= '/')
         savePath = savePath.concat('/');
     end
-    [IR4,VIS,WV,tlIR4,tlVIS,tlWV] = dataProcessingIR4(dirName);
+    [IR4,VIS,WV33,tlIR4,tlVIS,tlWV33] = dataProcessingIR4(dirName);
     if ~isempty(IR4)
         n = getFilesCount(savePath,'IR4');
         save(char(savePath.concat(strcat('IR4-',num2str(n),'.mat'))),'IR4','-v7.3');
@@ -43,15 +43,15 @@ function [] = GOES(dirName,joinFiles)
         save(char(savePath.concat(strcat('tlVIS-',num2str(n),'.mat'))),'tlVIS','-v7.3');
         %save(char(savePath.concat('VIS-timeline.mat')),'tlVIS');
     end
-    if ~isempty(WV)
-        n = getFilesCount(savePath,'WV');
-        save(char(savePath.concat(strcat('WV-',num2str(n),'.mat'))),'WV','-v7.3');
-        %save(char(savePath.concat('WV.mat')),'WV','-v7.3');
+    if ~isempty(WV3)
+        n = getFilesCount(savePath,'WV3');
+        save(char(savePath.concat(strcat('WV3-',num2str(n),'.mat'))),'WV3','-v7.3');
+        %save(char(savePath.concat('WV3.mat')),'WV3','-v7.3');
     end
-    if ~isempty(tlWV)
-        n = getFilesCount(savePath,'tlWV');
-        save(char(savePath.concat(strcat('tlWV-',num2str(n),'.mat'))),'tlWV','-v7.3');
-        %save(char(savePath.concat('WV-timeline.mat')),'tlWV');
+    if ~isempty(tlWV3)
+        n = getFilesCount(savePath,'tlWV3');
+        save(char(savePath.concat(strcat('tlWV3-',num2str(n),'.mat'))),'tlWV3','-v7.3');
+        %save(char(savePath.concat('WV3-timeline.mat')),'tlWV3');
     end
     if joinFiles
         try
@@ -59,8 +59,8 @@ function [] = GOES(dirName,joinFiles)
             filesJoin(savePath,'tlIR4',1);
             filesJoin(savePath,'VIS');
             filesJoin(savePath,'tlVIS',1);
-            filesJoin(savePath,'WV');
-            filesJoin(savePath,'tlWV',1);
+            filesJoin(savePath,'WV3');
+            filesJoin(savePath,'tlWV3',1);
         catch e
             disp(e.message);
         end 

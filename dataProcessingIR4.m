@@ -97,7 +97,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
                             newTimeStamp{5} = lenZ;
 %                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
                             tlVIS = cat(1,tlVIS,newTimeStamp);
-                        case 'WV33'
+                        case 'WV3'
                             if ~isempty(WV3)
                                 posZ = length(WV3(1,1,:))+1;
                             else
@@ -244,7 +244,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName,IR4,VIS,WV3
                             IR4 = cat(3,IR4,prodata);
                         case 'VIS'
                             VIS = cat(3,VIS,prodata);
-                        case 'WV33'
+                        case 'WV3'
                             WV3 = cat(3,WV3,prodata);
                     end
 %                     if ~mod(f,100)
