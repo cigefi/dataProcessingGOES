@@ -110,11 +110,15 @@ function MCSDetection(dirName,extra)
                                     for c=1:length(cols)
                                         [ele,nFT] = findNeighbors(nFT,[j,cols(c)],cofIndex);
                                         nMCS = cell(1,3);
-                                        [lat,lon] = findCentroid(ele);
-                                        nMCS{1} = lat;
-                                        nMCS{2} = lon;
-                                        nMCS{3} = length(ele(:,1));
-                                        MCS = cat(1,MCS,nMCS);
+                                        if ~isempty(ele)
+                                            [lat,lon] = findCentroid(ele);
+                                            nMCS{1} = lat;
+                                            nMCS{2} = lon;
+                                            nMCS{3} = length(ele(:,1));
+                                            MCS = cat(1,MCS,nMCS);
+                                        else
+                                            continue;
+                                        end
                                     end
                                 end
                             end
