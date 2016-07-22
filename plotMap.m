@@ -1,0 +1,10 @@
+f = figure('visible', 'on');
+hold on;
+[longrat,latgrat]=meshgrat(double(lons(:,1)),double(lats(1,:)));
+worldmap([min(min(latgrat)) max(max(latgrat))],[min(min(longrat)) max(max(longrat))]);
+set(gcf,'Color',[1,1,1]);
+colormap(parula);
+load coastlines;
+contourfm(latgrat,longrat,prodata,p,'LineStyle','none');
+plotm(coastlat, coastlon);
+plotm(coastlat, coastlon,'k');
