@@ -2,8 +2,12 @@ function [MCS,data] = findNeighbors(data,coords,cofIndex,MCS)
     if nargin < 4
         MCS = [];
     end
-    size = 0;
-    nuclei = coords;
+    if isempty(data)
+        return;
+    end
+    if length(coords)<2
+        [coords(1),coords(2)] = ind2sub(size(data),coords);
+    end
     i = coords(1);
     j = coords(2);
     fr = i;
@@ -22,14 +26,6 @@ function [MCS,data] = findNeighbors(data,coords,cofIndex,MCS)
     if j-1>=1
         fc = j-1;
     end
-%     cofIndex = cell(lr-fr+1,lc-fc+1);
-%     for h=1:length(cofIndex(:,1))
-%         for g=1:length(cofIndex(1,:))
-%             if h == 1
-%                 cofIndex{h,g} = [fr,
-%             cofIndex{h,g} = [fr*(h-1)-lr*(g-2),fc*(h-1)-lc*(g-2)];
-%         end
-%     end
     cofIndexTmp = cofIndex(fr:lr,fc:lc);
     cof = data(fr:lr,fc:lc);
     for h=1:length(cof(:,1))
@@ -37,14 +33,29 @@ function [MCS,data] = findNeighbors(data,coords,cofIndex,MCS)
             if cof(h,g) > 0
                 nPos = cofIndexTmp{h,g};
                 MCS = cat(1,MCS,nPos);
-                data(nPos(1),nPos(2)) = 0;
-                [MCS,data] = findNeighbors(data,nPos,cofIndex,MCS);
-%                 if sum(nPos ~= coords)
-%                     MCS = cat(1,MCS,nPos);
-%                     data(nPos(1),nPos(2)) = 0;
-%                     [MCS,data] = findNeighbors(data,nPos,cofIndex,MCS);
-%                 end
+                matri = reshape([cofIndex{:}],2,[])';
+                [~, ind]=ismember(matri,nPos,'rows');
+                i = findIndex2(ind);
+                if i~=-1
+                    data(i) = 0;
+                    [MCS,data] = findNeighbors(data,i,cofIndex,MCS);
+                end
+                %data(nPos(1),nPos(2)) = 0;
+                %[MCS,data] = findNeighbors(data,nPos,cofIndex,MCS);
             end
+        end
+    end
+end
+
+function [i] = findIndex2(index)
+    if sum(sum(index>0))>1
+       i = -1; 
+       return;
+    end
+    for j=1:length(index)
+        if index(j)
+            i = j;
+            return
         end
     end
 end
