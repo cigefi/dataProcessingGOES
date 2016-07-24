@@ -68,8 +68,11 @@ function MCSDetection(dirName,extra)
     for f = 3:length(dirData)
         fileT = path.concat(dirData(f).name);
         try
-            name = fileT.substring(fileT.lastIndexOf('/')+1,fileT.lastIndexOf('-')).concat('.mat');
-            nameTS = strcat('tl',var2Read,char(fileT.substring(fileT.lastIndexOf('-'))));
+            fsplit = fileT.split('-');
+            name = fsplit(1).substring(fsplit(1).lastIndexOf('/')+1).concat('.mat');
+            nameTS = strcat('tl',var2Read,'-',char(fsplit(2)),'-',char(fsplit(3)));
+%             name = fileT.substring(fileT.lastIndexOf('/')+1),fileT.lastIndexOf('-')).concat('.mat');
+%             nameTS = strcat('tl',var2Read,char(fileT.substring(fileT.lastIndexOf('-'))));
             nName = fileT.substring(fileT.lastIndexOf('/')+1);
         catch
             try
