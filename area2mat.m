@@ -4,7 +4,7 @@
 %
 % dirName = Path of the directory that contents the files and path for the
 % processed files
-function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tlVIS,tlWV3)
+function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tlVIS,tlWV3,rainyDays)
     switch nargin
         case 1
             IR4 = [];
@@ -13,6 +13,8 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
             tlIR4 = [];
             tlVIS = [];
             tlWV3 = [];
+            rainyDays = xlsread('E:/cigefi/ANA MARIA/GOES/RainyDays_list.ods');
+            rainyDays = rainyDays(:,1:3);
     end
     if nargin < 1
         error('area2mat: dirName is a required input')
@@ -20,9 +22,11 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
         dirName = strrep(dirName,'\','/'); % Clean dirName var
     end
     
+    %monthsName = {'January','February','March','April','May','June','July','August','September','October','November','December'};
+    monthsName = {'1','2','3','4','5','6','7','8','9','10','11','12'};
     dirData = dir(char(dirName(1)));  % Get the data for the current directory
     path = java.lang.String(dirName(1));
-    sTop = 9;
+    sTop = 49;
     if(path.charAt(path.length-1) ~= '/')
         path = path.concat('/');
     end
@@ -43,6 +47,9 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
     if(logPath.charAt(logPath.length-1) ~= '/')
         logPath = logPath.concat('/');
     end
+    refDate = NaN(3,3); % Reference date (IR4,VIS,WV)
+    alrd = 1;           % Access level for Reference date
+    countFil = 1;       % Processed files counter
     for f = 3:length(dirData)
         fileT = path.concat(dirData(f).name);
         %lio = fileT.lastIndexOf('.');
@@ -53,7 +60,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
                 gunzip(char(fileT),char(path));
                 fileT = name;
                 l = length(name);
-                var2Read = 'IR4';%char(name.substring(l-3));
+                var2Read = char(name.substring(l-3));
             catch e
                 disp(e.message);
                 continue;
@@ -70,47 +77,39 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
                     n = getFilesCount(savePath,var2Read);
                     switch (var2Read)
                         case 'IR4'
-                            if ~isempty(IR4)
-                                posZ = length(IR4(1,1,:))+1;
-                            else
-                                posZ = 1;
-                            end
-                            newTimeStamp = cell(1,5);
-                            newTimeStamp{1} = getDate(num2str(area.W4));
-                            newTimeStamp{2} = getTime(num2str(area.W5));
-                            newTimeStamp{3} = area.W33;
-                            newTimeStamp{4} = posZ + (n-1)*(sTop+1);
-                            newTimeStamp{5} = lenZ;
-%                             newTimeStamp = [getDate(num2str(area.W4)) area.W5 area.W33 posZ lenZ];
-                            tlIR4 = cat(1,tlIR4,newTimeStamp);
+                            alrd = 1;
+                            newTimestamp = cell(1,5);
+                            newTimestamp{1} = getDate(num2str(area.W4));
+                            newTimestamp{2} = getTime(num2str(area.W5));
+                            newTimestamp{3} = area.W33;
+                            cDate = date2double(newTimestamp{1});
+                            n = getFilesCount(savePath,char(strcat('IR4-',monthsName(cDate(1)))));
+                            newTimestamp{4} = countFil;%posZ + (n-1)*(sTop+1)*cDate(1);
+                            newTimestamp{5} = lenZ;
+%                             newTimestamp = [getDate(num2str(area.W4)) area.W5 area.W33 posZ lenZ];
+                            tlIR4 = cat(1,tlIR4,newTimestamp);
                         case 'VIS'
-                            if ~isempty(VIS)
-                                posZ = length(VIS(1,1,:))+1;
-                            else
-                                posZ = 1;
-                            end
-                            newTimeStamp = cell(1,5);
-                            newTimeStamp{1} = getDate(num2str(area.W4));
-                            newTimeStamp{2} = getTime(num2str(area.W5));
-                            newTimeStamp{3} = area.W33;
-                            newTimeStamp{4} = posZ + (n-1)*(sTop+1);
-                            newTimeStamp{5} = lenZ;
-%                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
-                            tlVIS = cat(1,tlVIS,newTimeStamp);
+                            alrd = 2;
+                            newTimestamp = cell(1,5);
+                            newTimestamp{1} = getDate(num2str(area.W4));
+                            newTimestamp{2} = getTime(num2str(area.W5));
+                            newTimestamp{3} = area.W33;
+                            cDate = date2double(newTimestamp{1});
+                            newTimestamp{4} = countFil;%posZ + (n-1)*(sTop+1)*cDate;
+                            newTimestamp{5} = lenZ;
+%                             newTimestamp = [area.W4 area.W5 area.W33 posZ lenZ];
+                            tlVIS = cat(1,tlVIS,newTimestamp);
                         case 'WV3'
-                            if ~isempty(WV3)
-                                posZ = length(WV3(1,1,:))+1;
-                            else
-                                posZ = 1;
-                            end
-                            newTimeStamp = cell(1,5);
-                            newTimeStamp{1} = getDate(num2str(area.W4));
-                            newTimeStamp{2} = getTime(num2str(area.W5));
-                            newTimeStamp{3} = area.W33;
-                            newTimeStamp{4} = posZ + (n-1)*(sTop+1);
-                            newTimeStamp{5} = lenZ;
-%                             newTimeStamp = [area.W4 area.W5 area.W33 posZ lenZ];
-                            tlWV3 = cat(1,tlWV3,newTimeStamp);
+                            alrd = 3;
+                            newTimestamp = cell(1,5);
+                            newTimestamp{1} = getDate(num2str(area.W4));
+                            newTimestamp{2} = getTime(num2str(area.W5));
+                            newTimestamp{3} = area.W33;
+                            cDate = date2double(newTimestamp{1});
+                            newTimestamp{4} = countFil;%posZ + (n-1)*(sTop+1)*cDate;
+                            newTimestamp{5} = lenZ;
+%                             newTimestamp = [area.W4 area.W5 area.W33 posZ lenZ];
+                            tlWV3 = cat(1,tlWV3,newTimestamp);
                         otherwise
                             disp(char(strcat(char(fileT),{' skipped file.'})));
                             continue;
@@ -235,6 +234,124 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
                         disp('Error, cannot delete var data');
                     end
                 end
+%                 cDate = date2double(newTimestamp{1});
+                [~, ind]=ismember(rainyDays,[cDate(3),cDate(1),cDate(2)],'rows');
+                i = findIndex2(ind);
+                if i < 0
+                    switch(alrd)                % Delete timestamp from reg
+                        case 1
+                            tlIR4(end,:) = []; 
+                        case 2
+                            tlVIS(end,:) = [];
+                        case 3
+                            tlWV3(end,:) = [];
+                    end
+                   continue; 
+                end
+                
+                if isempty(refDate(alrd))
+                    refDate = cDate;
+                end
+                if ~isempty(IR4) && (refDate(alrd,1)<cDate(1) || length(IR4(1,1,:))>sTop) && alrd == 1
+                    if refDate(alrd,1)<cDate(1)
+                        n = getFilesCount(savePath,char(strcat('IR4-',monthsName(cDate(1)-1))));
+                        save(char(savePath.concat(strcat('IR4-',monthsName(cDate(1)-1),'-',num2str(n),'.mat'))),'IR4','-v7.3');
+                        disp(char(strcat(num2str(length(IR4(1,1,:))*n),{' IR4 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
+                    else
+                        save(char(savePath.concat(strcat('IR4-',monthsName(cDate(1)),'-',num2str(n),'.mat'))),'IR4','-v7.3');
+                        disp(char(strcat(num2str(length(IR4(1,1,:))*n+sTop*cDate(1)),{' IR4 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
+                    end
+                    try
+                        clear IR4;
+                    catch
+                        disp('Error, cannot delete var IR4');
+                    end
+                    IR4 = [];
+                elseif ~isempty(VIS) && (refDate(alrd,1)<cDate(1) || length(VIS(1,1,:))>sTop) && alrd == 2
+                    if refDate(alrd,1)<cDate(1)
+                        n = getFilesCount(savePath,char(strcat('VIS-',monthsName(cDate(1)-1))));  
+                        save(char(savePath.concat(strcat('VIS-',monthsName(cDate(1)-1),'-',num2str(n),'.mat'))),'VIS','-v7.3');
+                        disp(char(strcat(num2str(length(VIS(1,1,:))*n),{' VIS saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
+                    else
+                        save(char(savePath.concat(strcat('VIS-',monthsName(cDate(1)),'-',num2str(n),'.mat'))),'VIS','-v7.3');
+                        disp(char(strcat(num2str(length(VIS(1,1,:))*n+sTop*cDate(1)),{' VIS saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
+                    end
+                    try
+                        clear VIS;
+                    catch
+                        disp('Error, cannot delete var VIS');
+                    end
+                    VIS = [];
+                elseif ~isempty(WV3) && (refDate(alrd,1)<cDate(1) || length(WV3(1,1,:))>sTop) && alrd == 3
+                    if refDate(alrd,1)<cDate(1)
+                        n = getFilesCount(savePath,char(strcat('WV3-',monthsName(cDate(1)-1))));  
+                        save(char(savePath.concat(strcat('WV3-',monthsName(cDate(1)-1),'-',num2str(n),'.mat'))),'WV3','-v7.3');
+                        disp(char(strcat(num2str(length(WV3(1,1,:))*n),{' WV3 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
+                    else
+                        save(char(savePath.concat(strcat('WV3-',monthsName(cDate(1)),'-',num2str(n),'.mat'))),'WV3','-v7.3');
+                        disp(char(strcat(num2str(length(WV3(1,1,:))*n+sTop*cDate(1)),{' WV3 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
+                    end
+                    try
+                        clear WV3;
+                    catch
+                        disp('Error, cannot delete var WV3');
+                    end
+                    WV3 = [];
+                end
+                if ~isempty(tlIR4) && (refDate(alrd,1)<cDate(1)|| length(tlIR4(:,1))>sTop) && alrd == 1
+                    if refDate(alrd,1)<cDate(1)
+                        tmp = tlIR4(end,:);
+                        tlIR4(end,:) = [];
+                        n = getFilesCount(savePath,char(strcat('tlIR4-',monthsName(cDate(1)-1))));
+                        save(char(savePath.concat(strcat('tlIR4-',monthsName(cDate(1)-1),'-',num2str(n),'.mat'))),'tlIR4','-v7.3');
+                    else
+                        tmp = [];
+                        n = getFilesCount(savePath,char(strcat('tlIR4-',monthsName(cDate(1)))));
+                        save(char(savePath.concat(strcat('tlIR4-',monthsName(cDate(1)),'-',num2str(n),'.mat'))),'tlIR4','-v7.3');
+                    end
+                    try
+                        clear tlIR4;
+                    catch
+                        disp('Error, cannot delete var tlIR4');
+                    end
+                    tlIR4 = tmp;
+                elseif ~isempty(tlVIS) && (refDate(alrd,1)<cDate(1)|| length(tlVIS(:,1))>sTop) && alrd == 2
+                    if refDate(alrd,1)<cDate(1)
+                        tmp = tlVIS(end,:);
+                        tlVIS(end,:) = [];
+                         n = getFilesCount(savePath,char(strcat('tlVIS-',monthsName(cDate(1)-1))));
+                         save(char(savePath.concat(strcat('tlVIS-',monthsName(cDate(1)-1),'-',num2str(n),'.mat'))),'tlVIS','-v7.3');
+                    else
+                        tmp = [];
+                        n = getFilesCount(savePath,char(strcat('tlVIS-',monthsName(cDate(1)))));
+                        save(char(savePath.concat(strcat('tlVIS-',monthsName(cDate(1)),'-',num2str(n),'.mat'))),'tlIR4','-v7.3');
+                    end
+                    try
+                        clear tlVIS;
+                    catch
+                        disp('Error, cannot delete var tlVIS');
+                    end
+                    tlVIS = tmp;
+                
+                elseif ~isempty(tlWV3) && (refDate(alrd,1)<cDate(1)|| length(tlWV3(:,1))>sTop) && alrd == 3
+                    if refDate(alrd,1)<cDate(1)
+                        tmp = tlWV3(end,:);
+                        tlWV3(end,:) = [];
+                        n = getFilesCount(savePath,char(strcat('tlWV3-',monthsName(cDate(1)-1))));
+                        save(char(savePath.concat(strcat('tlWV3-',monthsName(cDate(1)-1),'-',num2str(n),'.mat'))),'tlWV3','-v7.3');
+                    else
+                        tmp = [];
+                        n = getFilesCount(savePath,char(strcat('tlWV3-',monthsName(cDate(1)))));
+                        save(char(savePath.concat(strcat('tlWV3-',monthsName(cDate(1)),'-',num2str(n),'.mat'))),'tlIR4','-v7.3');
+                    end
+                    try
+                        clear tlWV3;
+                    catch
+                        disp('Error, cannot delete var tlWV3');
+                    end
+                    tlWV3 = tmp;
+                end
+                refDate(alrd,:) = cDate;
                 if ~isempty(prodata)
                     if ~exist(char(savePath),'dir')
                         mkdir(char(savePath));
@@ -248,80 +365,80 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
                             WV3 = cat(3,WV3,prodata);
                     end
 
-                    if ~isempty(IR4)
-                        if length(IR4(1,1,:))>sTop
-                            %n = getFilesCount(savePath,'IR4');
-                            save(char(savePath.concat(strcat('IR4-',num2str(n),'.mat'))),'IR4','-v7.3');
-                            disp(char(strcat(num2str(length(IR4(1,1,:))*n),{' IR4 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
-                            try
-                                clear IR4;
-                            catch
-                                disp('Error, cannot delete var IR4');
-                            end
-                            IR4 = [];
-                        end
-                        if length(tlIR4(:,1))>sTop
-                            %n = getFilesCount(savePath,'tlIR4');
-                            save(char(savePath.concat(strcat('tlIR4-',num2str(n),'.mat'))),'tlIR4','-v7.3');
-                            try
-                                clear tlIR4;
-                            catch
-                                disp('Error, cannot delete var tlIR4');
-                            end
-                            tlIR4 = [];
-                        end
-                    end
-                    if ~isempty(VIS)
-                        if length(VIS(1,1,:))>sTop
-                            %n = getFilesCount(savePath,'VIS');
-                            save(char(savePath.concat(strcat('VIS-',num2str(n),'.mat'))),'VIS','-v7.3');
-                            disp(char(strcat(num2str(length(VIS(1,1,:))*n),{' VIS saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
-                            try
-                                clear VIS;
-                            catch
-                                disp('Error, cannot delete var VIS');
-                            end
-                            VIS = [];
-                        end
-                        if length(tlVIS(:,1))>sTop
-                            %n = getFilesCount(savePath,'tlVIS');
-                            save(char(savePath.concat(strcat('tlVIS-',num2str(n),'.mat'))),'tlVIS','-v7.3');
-                            try
-                                clear tlVIS;
-                            catch
-                                disp('Error, cannot delete var tlVIS');
-                            end
-                            tlVIS = [];
-                        end
-                    end
-                    if ~isempty(WV3)
-                        if length(WV3(1,1,:))>sTop
-                            %n = getFilesCount(savePath,'WV3');
-                            save(char(savePath.concat(strcat('WV3-',num2str(n),'.mat'))),'WV3','-v7.3');
-                            disp(char(strcat(num2str(length(WV3(1,1,:))*n),{' WV3 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
-                            try
-                                clear WV3;
-                            catch
-                                disp('Error, cannot delete var WV3');
-                            end
-                            WV3 = [];
-                        end
-                        if length(tlWV3(:,1))>sTop
-                            %n = getFilesCount(savePath,'tlWV3');
-                            save(char(savePath.concat(strcat('tlWV3-',num2str(n),'.mat'))),'tlWV3','-v7.3');
-                            try
-                                clear tlWV3;
-                            catch
-                                disp('Error, cannot delete var tlWV3');
-                            end
-                            tlWV3 = [];
-                        end
-                    end
-                    %GOES = cat(3,GOES,prodata);
+%                     if ~isempty(IR4)
+%                         if length(IR4(1,1,:))>sTop
+%                             %n = getFilesCount(savePath,'IR4');
+%                             save(char(savePath.concat(strcat('IR4-',num2str(n),'.mat'))),'IR4','-v7.3');
+%                             disp(char(strcat(num2str(length(IR4(1,1,:))*n),{' IR4 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
+%                             try
+%                                 clear IR4;
+%                             catch
+%                                 disp('Error, cannot delete var IR4');
+%                             end
+%                             IR4 = [];
+%                         end
+%                         if length(tlIR4(:,1))>sTop
+%                             %n = getFilesCount(savePath,'tlIR4');
+%                             save(char(savePath.concat(strcat('tlIR4-',num2str(n),'.mat'))),'tlIR4','-v7.3');
+%                             try
+%                                 clear tlIR4;
+%                             catch
+%                                 disp('Error, cannot delete var tlIR4');
+%                             end
+%                             tlIR4 = [];
+%                         end
+%                     end
+%                     if ~isempty(VIS)
+%                         if length(VIS(1,1,:))>sTop
+%                             %n = getFilesCount(savePath,'VIS');
+%                             save(char(savePath.concat(strcat('VIS-',num2str(n),'.mat'))),'VIS','-v7.3');
+%                             disp(char(strcat(num2str(length(VIS(1,1,:))*n),{' VIS saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
+%                             try
+%                                 clear VIS;
+%                             catch
+%                                 disp('Error, cannot delete var VIS');
+%                             end
+%                             VIS = [];
+%                         end
+%                         if length(tlVIS(:,1))>sTop
+%                             %n = getFilesCount(savePath,'tlVIS');
+%                             save(char(savePath.concat(strcat('tlVIS-',num2str(n),'.mat'))),'tlVIS','-v7.3');
+%                             try
+%                                 clear tlVIS;
+%                             catch
+%                                 disp('Error, cannot delete var tlVIS');
+%                             end
+%                             tlVIS = [];
+%                         end
+%                     end
+%                     if ~isempty(WV3)
+%                         if length(WV3(1,1,:))>sTop
+%                             %n = getFilesCount(savePath,'WV3');
+%                             save(char(savePath.concat(strcat('WV3-',num2str(n),'.mat'))),'WV3','-v7.3');
+%                             disp(char(strcat(num2str(length(WV3(1,1,:))*n),{' WV3 saved files (Processed files '},{' '},num2str(f-2),{' of '},num2str(length(dirData)-2),')')));
+%                             try
+%                                 clear WV3;
+%                             catch
+%                                 disp('Error, cannot delete var WV3');
+%                             end
+%                             WV3 = [];
+%                         end
+%                         if length(tlWV3(:,1))>sTop
+%                             %n = getFilesCount(savePath,'tlWV3');
+%                             save(char(savePath.concat(strcat('tlWV3-',num2str(n),'.mat'))),'tlWV3','-v7.3');
+%                             try
+%                                 clear tlWV3;
+%                             catch
+%                                 disp('Error, cannot delete var tlWV3');
+%                             end
+%                             tlWV3 = [];
+%                         end
+%                     end
                 end
                 fid = fopen(strcat(char(logPath),'log.txt'), 'at+');
                 fprintf(fid, '[SAVED][%s] %s\n',char(datestr(now)),char(fileT));
                 fclose(fid);
+                countFil = countFil +1;
 %                 disp(char(strcat({'Data saved: '},char(fileT))));
                 delete(char(fileT));
 
@@ -341,7 +458,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
         else
             if isequal(dirData(f).isdir,1)
                 newPath = char(path.concat(dirData(f).name));
-                [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat({newPath,char(savePath.concat(dirData(f).name)),char(logPath)},IR4,VIS,WV3,tlIR4,tlVIS,tlWV3);
+                [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat({newPath,char(savePath.concat(dirData(f).name)),char(logPath)},IR4,VIS,WV3,tlIR4,tlVIS,tlWV3,rainyDays);
             end
         end
     end

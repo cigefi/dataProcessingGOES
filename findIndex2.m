@@ -1,4 +1,5 @@
 function [i] = findIndex2(index)
+    i = -1;
     if sum(sum(index>0))>1
        i = -1; 
        return;

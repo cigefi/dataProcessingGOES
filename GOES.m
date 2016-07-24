@@ -22,8 +22,10 @@ function [] = GOES(dirName,joinFiles)
     if(savePath.charAt(savePath.length-1) ~= '/')
         savePath = savePath.concat('/');
     end
-    [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = dataProcessingIR4(dirName);
+    [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName);
     if ~isempty(IR4)
+        %cDate = date2double(newTimestamp{1});
+        %n = getFilesCount(savePath,strcat('IR4-',monthsName(cDate(1))));
         n = getFilesCount(savePath,'IR4');
         save(char(savePath.concat(strcat('IR4-',num2str(n),'.mat'))),'IR4','-v7.3');
         disp('IR4 files processed');
