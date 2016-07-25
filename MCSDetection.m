@@ -217,7 +217,7 @@ function MCSDetection(dirName,extra)
                     if mod(rema,2)~=0 
                         rema = (length(dirData)-4)/2;
                     end
-                    disp(char(strcat({'Processed levels: '},num2str(z),{' (remaining images '},num2str(rema-con-2),')')));
+                    disp(char(strcat({'Processed levels: '},num2str(z),{' (remaining images '},num2str(rema-con),')')));
                 end
                 con = con + 1; 
                 if ~isempty(out)

@@ -23,7 +23,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
     end
     
     %monthsName = {'January','February','March','April','May','June','July','August','September','October','November','December'};
-    monthsName = {'1','2','3','4','5','6','7','8','9','10','11','12'};
+    monthsName = {'01','02','03','04','05','06','07','08','09','10','11','12'};
     dirData = dir(char(dirName(1)));  % Get the data for the current directory
     path = java.lang.String(dirName(1));
     sTop = 49;
