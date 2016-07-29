@@ -104,7 +104,7 @@ function MCSDetection(dirName,extra)
                     end
                     for t=1:length(tempVec)
                         %disp(char(strcat({'Processing files for: '},num2str(tempVec(t)),'+-',num2str(toleVec(t)),{' K'})));
-                        [dum,nF] = filtrateTemp(data(:,:,z),tempVec(t),toleVec(t));
+                        [dumb,nF] = filtrateTemp(data(:,:,z),tempVec(t),toleVec(t));
                         nFT = nF(:,:);
                         MCS = [];
                         neighborhoods = cell(32,32);
@@ -223,7 +223,7 @@ function MCSDetection(dirName,extra)
                     save(char(newName),'-struct','S','-v7.3');
                     try
                         clear out;
-                        clear dum;
+                        clear dumb;
                         clear neighborhoods;
                     catch
                     end

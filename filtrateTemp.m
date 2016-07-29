@@ -38,11 +38,3 @@ function[data,data2] = filtrateTemp(data,temp,err)
 %         disp(char(strcat('POS(',num2str(i),')')));
 %     end
 end
-
-function [res] = hasNeighbors(data)
-    if sum(sum(data~=0))>0
-        res = 1;
-    else
-        res = 0;
-    end
-end
