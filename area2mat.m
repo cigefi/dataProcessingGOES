@@ -235,7 +235,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
                     end
                 end
 %                 cDate = date2double(newTimestamp{1});
-                [~, ind]=ismember(rainyDays,[cDate(3),cDate(1),cDate(2)],'rows');
+                [dumb, ind]=ismember(rainyDays,[cDate(3),cDate(1),cDate(2)],'rows');
                 i = findIndex2(ind);
                 if i < 0
                     switch(alrd)                % Delete timestamp from reg
@@ -263,6 +263,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
                     end
                     try
                         clear IR4;
+                        clear dumb;
                     catch
                         disp('Error, cannot delete var IR4');
                     end
@@ -278,6 +279,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
                     end
                     try
                         clear VIS;
+                        clear dumb;
                     catch
                         disp('Error, cannot delete var VIS');
                     end
@@ -293,6 +295,7 @@ function [IR4,VIS,WV3,tlIR4,tlVIS,tlWV3] = area2mat(dirName,IR4,VIS,WV3,tlIR4,tl
                     end
                     try
                         clear WV3;
+                        clear dumb;
                     catch
                         disp('Error, cannot delete var WV3');
                     end
