@@ -4,7 +4,6 @@ function MCSDetection(dirName,extra)
     else
         dirName = strrep(dirName,'\','/'); % Clean dirName var
     end
-    rainyDays = [];
     vars = [];
     tempVec = 215;
     toleVec = 25;
@@ -15,8 +14,6 @@ function MCSDetection(dirName,extra)
                 tmp = reshape(extra,2,[])'; 
                 for i=1:1:length(tmp(:,1))
                     switch lower(char(tmp{i,1}))
-                        case 'rainydays'
-                            rainyDays = tmp{i,2};
                         case 'temp'
                             tempVec = tmp{i,2};
                         case 'var2read'
@@ -107,7 +104,7 @@ function MCSDetection(dirName,extra)
                     end
                     for t=1:length(tempVec)
                         %disp(char(strcat({'Processing files for: '},num2str(tempVec(t)),'+-',num2str(toleVec(t)),{' K'})));
-                        [~,nF] = filtrateTemp(data(:,:,z),tempVec(t),toleVec(t));
+                        [dum,nF] = filtrateTemp(data(:,:,z),tempVec(t),toleVec(t));
                         nFT = nF(:,:);
                         MCS = [];
                         neighborhoods = cell(32,32);
@@ -226,15 +223,18 @@ function MCSDetection(dirName,extra)
                     save(char(newName),'-struct','S','-v7.3');
                     try
                         clear out;
+                        clear dum;
+                        clear neighborhoods;
                     catch
                     end
                     out = [];
                 end
             catch e
-                disp(e.message);
+                msg = e.message;
+                disp(msg);
                 try
                     fid = fopen(strcat(char(logPath),'log.txt'), 'at+');
-                    fprintf(fid, '[ERROR][%s] %s\n %s\n',char(datestr(now)),char(fileT),char(exception.message));
+                    fprintf(fid, '[ERROR][%s] %s\n %s\n',char(datestr(now)),char(fileT),msg);
                     fclose(fid);
                 catch
                 end

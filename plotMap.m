@@ -21,7 +21,7 @@ function plotMap(data2D,label,path,display)
     %colormap(parula);
     load coastlines;
     %contourfm(latgrat',longrat',data(:,:,z),2,'LineStyle','none');
-    contourfm(latgrat',longrat',data2D,2,'LineStyle','none');
+    contourfm(latgrat',longrat',data2D,10,'LineStyle','none');
     %plotm(coastlat, coastlon);
     plotm(coastlat, coastlon,'k');
     cb = colorbar();
@@ -33,7 +33,7 @@ function plotMap(data2D,label,path,display)
     ax.XLimMode = 'manual';
     ax.YLimMode = 'manual';
     ax.ZLimMode = 'manual';
-    set(cb,'ylim',[0 240],'ytick',cat(2,0:30:190,190:10:240));%190:10:240)
+    set(cb,'ylim',[0 240],'ytick',cat(2,0:20:190,190:10:240));%190:10:240)
     caxis([0, 240]);
     print(path,'-dpng');%,'-r0');
     close(f);
