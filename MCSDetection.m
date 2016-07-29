@@ -214,7 +214,7 @@ function MCSDetection(dirName,extra)
                     if mod(rema,2)~=0 
                         rema = (length(dirData)-4)/2;
                     end
-                    disp(char(strcat({'Processed levels: '},num2str(z),{' (remaining images '},num2str(rema-con),')')));
+                    disp(char(strcat({'Processed levels: '},num2str(z),{' (remaining images '},num2str(rema-con+1),')')));
                 end
                 con = con + 1; 
                 if ~isempty(out)
@@ -228,6 +228,7 @@ function MCSDetection(dirName,extra)
                     catch
                     end
                     out = [];
+                    disp(char(strcat({'File saved: '},char(fileT))));
                 end
             catch e
                 msg = e.message;
