@@ -34,11 +34,15 @@ function [MCS,data] = findNeighbors(data,coords,cofIndex,MCS)
                 nPos = cofIndexTmp{h,g};
                 MCS = cat(1,MCS,nPos);
                 matri = reshape([cofIndex{:}],2,[])';
-                [~, ind]=ismember(matri,nPos,'rows');
+                [dumb, ind]=ismember(matri,nPos,'rows');
                 i = findIndex2(ind);
                 if i~=-1
                     data(i) = 0;
                     [MCS,data] = findNeighbors(data,i,cofIndex,MCS);
+                end
+                try
+                    clear dumb;
+                catch
                 end
                 %data(nPos(1),nPos(2)) = 0;
                 %[MCS,data] = findNeighbors(data,nPos,cofIndex,MCS);
