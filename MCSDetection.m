@@ -4,7 +4,7 @@ function MCSDetection(dirName,extra)
     else
         dirName = strrep(dirName,'\','/'); % Clean dirName var
     end
-    vars = [];
+    %vars = [];
     tempVec = 215;
     toleVec = 25;
     var2Read = 'IR4'; % Default value IR4
@@ -219,12 +219,14 @@ function MCSDetection(dirName,extra)
                 con = con + 1; 
                 if ~isempty(out)
                     newName = savePath.concat(strcat({'[MCS] '},char(nName)));
-                    S.(var2Read) = out;
+                    S = struct(var2Read,out);
+                    %S.(var2Read) = out;
                     save(char(newName),'-struct','S','-v7.3');
                     try
                         clear out;
                         clear dumb;
                         clear neighborhoods;
+                        clear S;
                     catch
                     end
                     out = [];
