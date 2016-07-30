@@ -5,6 +5,11 @@ function[data,data2] = filtrateTemp(data,temp,err)
     data(data<(temp-err)) = 0;
     data(data>(temp+err)) = 0;
     data2 = nlfilter(data,[3 3],'hasNeighbors');
+    try
+        clear data
+    catch
+    end
+    data = NaN;
     %data2 = nlfilter(data,[3 3],@(b) b(5)*all(sum(sum([1 2 3 4 6 7 8 9])) > 0));
 %     data2 = data(:,:);
 %     for i=1:length(data(:,1))

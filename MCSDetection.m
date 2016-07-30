@@ -5,6 +5,7 @@ function MCSDetection(dirName,extra)
         dirName = strrep(dirName,'\','/'); % Clean dirName var
     end
     %vars = [];
+    email = [];
     tempVec = 215;
     toleVec = 25;
     var2Read = 'IR4'; % Default value IR4
@@ -21,6 +22,8 @@ function MCSDetection(dirName,extra)
                             if length(vars) < 2
                                 var2Read = vars{1};
                             end
+                        case 'email'
+                            email = tmp{i,2};
                     end
                 end
             end
@@ -236,6 +239,9 @@ function MCSDetection(dirName,extra)
                 msg = e.message;
                 disp(msg);
                 try
+                    if ~isempty(email)
+                        mailNoti(msg,email);
+                    end
                     fid = fopen(strcat(char(logPath),'log.txt'), 'at+');
                     fprintf(fid, '[ERROR][%s] %s\n %s\n',char(datestr(now)),char(fileT),msg);
                     fclose(fid);
@@ -243,6 +249,9 @@ function MCSDetection(dirName,extra)
                 end
             end
         end
+    end
+    if ~isempty(email)
+        mailNoti(strcat({'Execution finished. Path: '},char(path)),email);
     end
 end
 
